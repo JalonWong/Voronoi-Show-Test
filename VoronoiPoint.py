@@ -6,20 +6,44 @@ PointColor = [0, 0, 0]
 Points = []
 MatrixSize = 0
 
+# Euclidean distance
+def getEuclidean(x1, y1, x2, y2):
+    return (x1 - x2)**2 + (y1 - y2)**2
+    # omit square root to decrease computation (it's monotonic function)
+
+
+# Chebyshev distance
+def getChebyshev(x1, y1, x2, y2):
+    a = abs(x1 - x2)
+    b = abs(y1 - y2)
+
+    return max(a, b)
+
+
+# Manhattan distance
+def getManhattan(x1, y1, x2, y2):
+    return abs(x1 - x2) + abs(y1 - y2)
+
+DistanceFunc = getEuclidean
+
+def ChangeDistanceFunc(n):
+    global DistanceFunc
+
+    if n == 1:
+        DistanceFunc = getEuclidean
+    elif n == 2:
+        DistanceFunc = getChebyshev
+    else:
+        DistanceFunc = getManhattan
+
 class Point:
     def __init__(self, x, y):
         self.x = int(x)
         self.y = int(y)
         self.color = [random.random(), random.random(), random.random()]
-
-    def getChebyshev(self, x, y):
-        if abs(self.x - x) > abs(self.y - y):
-            return abs(self.x - x)
-        else:
-            return abs(self.y - y)
     
     def getDistance(self, x, y):
-        return self.getChebyshev(int(x), int(y))
+        return DistanceFunc(self.x, self.y, int(x), int(y))
 
 
 def findNearestPoint(x, y):

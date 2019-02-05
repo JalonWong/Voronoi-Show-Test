@@ -85,18 +85,22 @@ def mouse(button, state, x, y):
             # print('x: {}, y: {}'.format(x, y))
             vp.AddPoint(x, y)
             glutPostRedisplay()
-    
-    if button == GLUT_RIGHT_BUTTON:
-        if state == GLUT_UP:
-            vp.ClearPoints()
-            glClear(GL_COLOR_BUFFER_BIT)
-            # glutPostRedisplay()
 
 
 def keyboard(key, x, y):
     k = ord(key)
     if k == 27 or k == ord('q'):  # Esc is 27
         sys.exit(0)
+    elif k == ord('c'):
+        vp.ClearPoints()
+        glClear(GL_COLOR_BUFFER_BIT)
+        glutPostRedisplay()
+    elif k == ord('1') or k == ord('2') or k == ord('3'):
+        vp.ChangeDistanceFunc(k - ord('0'))
+        global RefreshFlag
+        RefreshFlag = True
+        glutPostRedisplay()
+
 
 def init():
     glClearColor(0, 0, 0, 0)
