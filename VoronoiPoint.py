@@ -1,7 +1,6 @@
 import numpy as np
 import random
 
-# Make a matrix with all zeros and increasing elements on the diagonal
 PointColor = [0, 0, 0]
 Points = []
 MatrixWidth = 0
@@ -49,13 +48,13 @@ class Point:
 
 
 def findNearestPoint(x, y):
-    min_dist = Points[0].getDistance(x, y)
+    minDist = Points[0].getDistance(x, y)
     ret = Points[0]
     
     for p in Points:    
         d = p.getDistance(x, y)
-        if d < min_dist:
-            min_dist = d
+        if d < minDist:
+            minDist = d
             ret = p
     
     return ret
@@ -74,38 +73,58 @@ def GenerateMatrix():
     for p in Points:
         DrawPointFunc(p.x, p.y, PointColor)
 
-def VerticalScan(pn, i, h):
-    for j in range(pn.y, h):
-        p = findNearestPoint(i, j)
-        if p is pn:
-            DrawPointFunc(i, j, p.color)
+def ScanArea(pn, l, u, r, b):
+    cnt = 0
+
+    for i in range(l, r + 1):
+        if i < 0 or i >= MatrixWidth:
+            continue
+        
+        if b >= 0:
+            p = findNearestPoint(i, b)
+            if p is pn:
+                DrawPointFunc(i, b, p.color)
+                cnt += 1
+
+        if u < MatrixHeight:
+            p = findNearestPoint(i, u)
+            if p is pn:
+                DrawPointFunc(i, u, p.color)
+                cnt += 1
+        
     
-    for j in range(pn.y, -1, -1):
-        p = findNearestPoint(i, j)
-        if p is pn:
-            DrawPointFunc(i, j, p.color)
+    for j in range(b + 1, u):
+        if j < 0 or j >= MatrixHeight:
+            continue
+        
+        if l >= 0:
+            p = findNearestPoint(l, j)
+            if p is pn:
+                DrawPointFunc(l, j, p.color)
+                cnt += 1
+        
+        if r < MatrixWidth:
+            p = findNearestPoint(r, j)
+            if p is pn:
+                DrawPointFunc(r, j, p.color)
+                cnt += 1
+    
+    return (cnt != 0)
 
 def UpdateMatrix():
-    if len(Points) == 0:
+    try:
+        pn = Points[-1]
+    except IndexError:
         return
 
-    pn = Points[-1]
-    
-    w = MatrixWidth
-    h = MatrixHeight
-    for i in range(pn.x, w):
-        VerticalScan(pn, i, h)
-    
-    for i in range(pn.x, -1, -1):
-        VerticalScan(pn, i, h)
+    x = pn.x
+    y = pn.y
+    r = 1
+
+    while ScanArea(pn, x - r, y + r, x + r, y - r):
+        r += 1
     
     DrawPointFunc(pn.x, pn.y, PointColor)
-
-def GetNewColor():
-    if len(Points) == 0:
-        return PointColor
-        
-    return Points[-1].color
         
 def ClearPoints():
     Points.clear()
@@ -118,7 +137,7 @@ def AddPoint(x, y):
 
 def AddRamdomPoints(n):
     for i in range(n):
-        Points.append(Point( random.random() * 100, random.random() * 100))
+        Points.append(Point( random.random() * MatrixWidth, random.random() * MatrixHeight))
 
 def Init(w, h, drawPoint):
     global DrawPointFunc

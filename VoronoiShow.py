@@ -8,24 +8,22 @@ WH = 0
 WOffsetX = 0
 WOffsetY = 0
 MatrixSize = 128.0
-lastColor = [0, 0, 0]
+LastColor = [0, 0, 0]
 RefreshFlag = False
 
 def drwaPoint(x, y, color):
-    global lastColor
+    global LastColor
 
-    if lastColor != color:
+    if LastColor != color:
         glColor3fv(color)
-        lastColor = color
+        LastColor = color
     
     glVertex2i(x, y)
 
 def drawFunc():
     global RefreshFlag
-    # glClear(GL_COLOR_BUFFER_BIT)
-    # glRotatef(1, 0, 1, 0)
-    # glutWireTeapot(0.5)
 
+    # glClear(GL_COLOR_BUFFER_BIT)
     glBegin(GL_POINTS)
 
     if RefreshFlag:
@@ -62,13 +60,11 @@ def reshape(w, h):
         gluOrtho2D(-1 - WOffsetX, size + WOffsetX, -1, size)
         glPointSize(float(h) / size + 1)
 
-    # gluOrtho2D(0, 99, 0, 99)
-
     global RefreshFlag
     RefreshFlag = True
 
 
-def GetMatrixCoordinate(x, y):
+def ConverToMatrixCoordinate(x, y):
     x = x * (MatrixSize + WOffsetX * 2) / WW - WOffsetX
     y = (WH - y) * (MatrixSize + WOffsetY * 2) / WH - WOffsetY
     return int(x), int(y)
@@ -81,8 +77,7 @@ def mouse(button, state, x, y):
     if button == GLUT_LEFT_BUTTON:
         if state == GLUT_UP:
             # print('x1: {}, y1: {}'.format(x, y))
-            x, y = GetMatrixCoordinate(x, y)
-            # print('x: {}, y: {}'.format(x, y))
+            x, y = ConverToMatrixCoordinate(x, y)
             vp.AddPoint(x, y)
             glutPostRedisplay()
 
@@ -111,7 +106,7 @@ def init():
 glutInit()
 glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB)
 glutInitWindowSize(400, 400)
-glutCreateWindow("V")
+glutCreateWindow("Voronoi")
 vp.Init(MatrixSize, MatrixSize, drwaPoint)
 init()
 glutDisplayFunc(drawFunc)
