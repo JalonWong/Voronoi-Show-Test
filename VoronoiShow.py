@@ -30,9 +30,9 @@ def drawFunc():
 
     if RefreshFlag:
         RefreshFlag = False
-        vp.GenerateMatrix(drwaPoint)
+        vp.GenerateMatrix()
     else:
-        vp.UpdateMatrix(drwaPoint)
+        vp.UpdateMatrix()
     
     glEnd()
     glFlush()
@@ -112,7 +112,7 @@ glutInit()
 glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB)
 glutInitWindowSize(400, 400)
 glutCreateWindow("V")
-vp.Init(MatrixSize)
+vp.Init(MatrixSize, MatrixSize, drwaPoint)
 init()
 glutDisplayFunc(drawFunc)
 glutReshapeFunc(reshape)

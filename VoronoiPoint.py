@@ -4,11 +4,12 @@ import random
 # Make a matrix with all zeros and increasing elements on the diagonal
 PointColor = [0, 0, 0]
 Points = []
-MatrixSize = 0
+MatrixWidth = 0
+MatrixHeight = 0
 
 # Euclidean distance
 def getEuclidean(x1, y1, x2, y2):
-    return (x1 - x2)**2 + (y1 - y2)**2
+    return (x1 - x2) ** 2 + (y1 - y2) ** 2
     # omit square root to decrease computation (it's monotonic function)
 
 
@@ -25,6 +26,7 @@ def getManhattan(x1, y1, x2, y2):
     return abs(x1 - x2) + abs(y1 - y2)
 
 DistanceFunc = getEuclidean
+DrawPointFunc = None
 
 def ChangeDistanceFunc(n):
     global DistanceFunc
@@ -58,46 +60,46 @@ def findNearestPoint(x, y):
     
     return ret
 
-def GenerateMatrix(drawPoint):
+def GenerateMatrix():
     if len(Points) == 0:
         return
 
-    w = MatrixSize
-    h = MatrixSize
+    w = MatrixWidth
+    h = MatrixHeight
     for i in range(w):
         for j in range(h):
             p = findNearestPoint(i, j)
-            drawPoint(i, j, p.color)
+            DrawPointFunc(i, j, p.color)
 
     for p in Points:
-        drawPoint(p.x, p.y, PointColor)
+        DrawPointFunc(p.x, p.y, PointColor)
 
-def VerticalScan(pn, i, h, drawPoint):
+def VerticalScan(pn, i, h):
     for j in range(pn.y, h):
         p = findNearestPoint(i, j)
         if p is pn:
-            drawPoint(i, j, p.color)
+            DrawPointFunc(i, j, p.color)
     
     for j in range(pn.y, -1, -1):
         p = findNearestPoint(i, j)
         if p is pn:
-            drawPoint(i, j, p.color)
+            DrawPointFunc(i, j, p.color)
 
-def UpdateMatrix(drawPoint):
+def UpdateMatrix():
     if len(Points) == 0:
         return
 
     pn = Points[-1]
     
-    w = MatrixSize
-    h = MatrixSize
+    w = MatrixWidth
+    h = MatrixHeight
     for i in range(pn.x, w):
-        VerticalScan(pn, i, h, drawPoint)
+        VerticalScan(pn, i, h)
     
     for i in range(pn.x, -1, -1):
-        VerticalScan(pn, i, h, drawPoint)
+        VerticalScan(pn, i, h)
     
-    drawPoint(pn.x, pn.y, PointColor)
+    DrawPointFunc(pn.x, pn.y, PointColor)
 
 def GetNewColor():
     if len(Points) == 0:
@@ -109,7 +111,7 @@ def ClearPoints():
     Points.clear()
 
 def AddPoint(x, y):
-    if x < 0 or y < 0 or x >= MatrixSize or y >= MatrixSize:
+    if x < 0 or y < 0 or x >= MatrixWidth or y >= MatrixHeight:
         return
     
     Points.append(Point(x, y))
@@ -118,6 +120,10 @@ def AddRamdomPoints(n):
     for i in range(n):
         Points.append(Point( random.random() * 100, random.random() * 100))
 
-def Init(size):
-    global MatrixSize
-    MatrixSize = int(size)
+def Init(w, h, drawPoint):
+    global DrawPointFunc
+    global MatrixWidth
+    global MatrixHeight
+    MatrixWidth = int(w)
+    MatrixHeight = int(h)
+    DrawPointFunc = drawPoint
